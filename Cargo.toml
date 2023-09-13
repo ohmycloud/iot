@@ -1,0 +1,2 @@
+[workspace]
+members = ["iot_27930", "iot_iec104", "iot_common"]

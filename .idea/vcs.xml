@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/iec104" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/iot_27930" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/iot_common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/iot_iec104" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/pile27930" vcs="Git" />
+  </component>
+</project>

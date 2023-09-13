@@ -1,0 +1,16 @@
+[package]
+name = "iot_27930"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "iot_27930"
+path = "src/main.rs"
+
+[lib]
+name = "iot_27930"
+path = "src/lib.rs"
+
+[dependencies]
+hex = "0.4.3"
+iot_common = { path = "../iot_common" }
