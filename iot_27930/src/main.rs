@@ -41,12 +41,8 @@ fn main() {
         if let Ok(message) = message &&
             message.len() > 19
         {
-            let message = Message::new(&message);
-            let pf_code = message.pfcode;
-            if let Some(pf_code) = bytes_to_uint8(pf_code) {
-               let m = Frame::new(pf_code, &message);
-                println!("{:?}-{:?}", pf_code, m);
-            }
+            let message = Frame::new(&Message::new(&message));
+            println!("{:?}", message);
         }
     }
 }

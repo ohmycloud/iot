@@ -19,6 +19,7 @@ pub enum Frame {
     BclMessage(BCL),
     BcsMessage(BCS),
     CcsMessage(CCS),
+    BsmMessage(BSM),
     BmvMessage(BMV),
     BmtMessage(BMT),
     BstMessage(BST),
@@ -38,7 +39,8 @@ pub enum Frame {
 }
 
 impl Frame {
-    pub fn new(pf_code: u8, message: &Message) -> Self {
+    pub fn new(message: &Message) -> Self {
+        let pf_code = bytes_to_uint8(message.pfcode).unwrap_or(0);
         match pf_code {
             1 => Frame::CrmMessage(CRM::new(message)),
             2 => Frame::BrmMessage(BRM::new(message)),
@@ -50,6 +52,7 @@ impl Frame {
             16 => Frame::BclMessage(BCL::new(message)),
             17 => Frame::BcsMessage(BCS::new(message)),
             18 => Frame::CcsMessage(CCS::new(message)),
+            19 => Frame::BsmMessage(BSM::new(message)),
             21 => Frame::BmvMessage(BMV::new(message)),
             22 => Frame::BmtMessage(BMT::new(message)),
             25 => Frame::BstMessage(BST::new(message)),
@@ -72,15 +75,15 @@ impl Frame {
 
 #[derive(Debug)]
 pub struct BCL {
-    bcl_demand_volt: Option<f32>,
-    bcl_demand_current: Option<f32>,
-    bcl_charge_mode: Option<u8>,
+    pub bcl_demand_volt: Option<f32>,
+    pub bcl_demand_current: Option<f32>,
+    pub bcl_charge_mode: Option<u8>,
 }
 
 impl BCL {
     fn new(m: &Message) -> Self {
         let bcl_demand_volt = bytes_to_f32(&m.data[0..1], &m.data[1..2], 256, 0.1, 0.0);
-        let bcl_demand_current = bytes_to_f32(&m.data[2..3], &m.data[3..4], 256, 0.1, 0.0);
+        let bcl_demand_current = bytes_to_f32(&m.data[2..3], &m.data[3..4], 256, 0.1, 400.0);
         let bcl_charge_mode = bytes_to_uint8(&m.data[4..5]);
 
         Self {
@@ -93,13 +96,13 @@ impl BCL {
 
 #[derive(Debug)]
 pub struct BCP {
-    bcp_max_single_volt: Option<f32>,
-    bcp_max_current: Option<f32>,
-    bcp_max_energy: Option<f32>,
-    bcp_max_volt: Option<f32>,
-    bcp_max_temp: Option<u8>,
-    bcp_start_soc: Option<f32>,
-    bcp_start_volt: Option<f32>,
+    pub bcp_max_single_volt: Option<f32>,
+    pub bcp_max_current: Option<f32>,
+    pub bcp_max_energy: Option<f32>,
+    pub bcp_max_volt: Option<f32>,
+    pub bcp_max_temp: Option<u8>,
+    pub bcp_start_soc: Option<f32>,
+    pub bcp_start_volt: Option<f32>,
 }
 
 impl BCP {
@@ -127,13 +130,13 @@ impl BCP {
 }
 
 #[derive(Debug)]
-struct BCS {
-    bcs_volt_measure: Option<f32>,
-    bcs_current_measure: Option<f32>,
-    bcs_max_single_volt: Option<f32>,
-    bcs_max_single_volt_group: Option<u8>,
-    bcs_soc: Option<u8>,
-    bcs_remain_time: Option<u16>,
+pub struct BCS {
+    pub bcs_volt_measure: Option<f32>,
+    pub bcs_current_measure: Option<f32>,
+    pub bcs_max_single_volt: Option<f32>,
+    pub bcs_max_single_volt_group: Option<u8>,
+    pub bcs_soc: Option<u8>,
+    pub bcs_remain_time: Option<u16>,
 }
 
 impl BCS {
@@ -160,8 +163,8 @@ impl BCS {
 }
 
 #[derive(Debug)]
-struct BEM {
-    bem_error: Option<u32>,
+pub struct BEM {
+    pub bem_error: Option<u32>,
 }
 
 impl BEM {
@@ -172,8 +175,8 @@ impl BEM {
 }
 
 #[derive(Debug)]
-struct BHM {
-    bhm_max_charge_volt: Option<f32>,
+pub struct BHM {
+    pub bhm_max_charge_volt: Option<f32>,
 }
 
 impl BHM {
@@ -187,8 +190,8 @@ impl BHM {
 }
 
 #[derive(Debug)]
-struct BMT {
-    bmt_single_temp: Option<String>,
+pub struct BMT {
+    pub bmt_single_temp: Option<String>,
 }
 
 impl BMT {
@@ -215,8 +218,8 @@ impl BMT {
 }
 
 #[derive(Debug)]
-struct BMV {
-    bmv_single_volt: Option<String>,
+pub struct BMV {
+    pub bmv_single_volt: Option<String>,
 }
 
 impl BMV {
@@ -245,20 +248,20 @@ impl BMV {
 }
 
 #[derive(Debug)]
-struct BRM {
-    brm_version: Option<String>,
-    brm_battery_type: Option<i8>,
-    brm_rated_cap: Option<f32>,
-    brm_rated_volt: Option<f32>,
-    brm_manufacturer: Option<String>,
-    brm_bp_id: Option<i8>,
-    brm_bp_date: Option<String>,
-    brm_bp_charge_count: Option<u32>,
-    brm_equity_type: Option<u8>,
-    brm_vin: Option<String>,
-    brm_bms_version: Option<u32>,
-    brm_bms_version_date: Option<String>,
-    brm_bms_version_no: Option<u8>,
+pub struct BRM {
+    pub brm_version: Option<String>,
+    pub brm_battery_type: Option<i8>,
+    pub brm_rated_cap: Option<f32>,
+    pub brm_rated_volt: Option<f32>,
+    pub brm_manufacturer: Option<String>,
+    pub brm_bp_id: Option<i8>,
+    pub brm_bp_date: Option<String>,
+    pub brm_bp_charge_count: Option<u32>,
+    pub brm_equity_type: Option<u8>,
+    pub brm_vin: Option<String>,
+    pub brm_bms_version: Option<u32>,
+    pub brm_bms_version_date: Option<String>,
+    pub brm_bms_version_no: Option<u8>,
 }
 
 impl BRM {
@@ -308,24 +311,24 @@ impl BRM {
 }
 
 #[derive(Debug)]
-struct BRO {
-    cro_bms_status: Option<u8>,
+pub struct BRO {
+    pub bro_bms_status: Option<u8>,
 }
 
 impl BRO {
     fn new(m: &Message) -> Self {
-        let cro_bms_status = bytes_to_uint8(&m.data[0..1]);
-        Self { cro_bms_status }
+        let bro_bms_status = bytes_to_uint8(&m.data[0..1]);
+        Self { bro_bms_status }
     }
 }
 
 #[derive(Debug)]
-struct BSD {
-    bsd_stop_soc: Option<u8>,
-    bsd_min_single_volt: Option<f32>,
-    bsd_max_single_volt: Option<f32>,
-    bsd_min_temp: Option<u8>,
-    bsd_max_temp: Option<u8>,
+pub struct BSD {
+    pub bsd_stop_soc: Option<u8>,
+    pub bsd_min_single_volt: Option<f32>,
+    pub bsd_max_single_volt: Option<f32>,
+    pub bsd_min_temp: Option<u8>,
+    pub bsd_max_temp: Option<u8>,
 }
 
 impl BSD {
@@ -346,19 +349,19 @@ impl BSD {
 }
 
 #[derive(Debug)]
-struct BSM {
-    bsm_max_single_volt_no: Option<u8>,
-    bsm_max_temp: Option<u8>,
-    bsm_max_temp_no: Option<u8>,
-    bsm_min_temp: Option<u8>,
-    bsm_min_temp_no: Option<u8>,
-    bsm_single_volt_status: Option<u8>,
-    bsm_soc_status: Option<u8>,
-    bsm_current_status: Option<u8>,
-    bsm_temp_status: Option<u8>,
-    bsm_insulate_status: Option<u8>,
-    bsm_connect_status: Option<u8>,
-    bsm_charge_status: Option<u8>,
+pub struct BSM {
+    pub bsm_max_single_volt_no: Option<u8>,
+    pub bsm_max_temp: Option<u8>,
+    pub bsm_max_temp_no: Option<u8>,
+    pub bsm_min_temp: Option<u8>,
+    pub bsm_min_temp_no: Option<u8>,
+    pub bsm_single_volt_status: Option<u8>,
+    pub bsm_soc_status: Option<u8>,
+    pub bsm_current_status: Option<u8>,
+    pub bsm_temp_status: Option<u8>,
+    pub bsm_insulate_status: Option<u8>,
+    pub bsm_connect_status: Option<u8>,
+    pub bsm_charge_status: Option<u8>,
 }
 
 impl BSM {
@@ -394,17 +397,17 @@ impl BSM {
 }
 
 #[derive(Debug)]
-struct BST {
-    bst_insulation_status: Option<u8>,
-    bst_conn_over_temp_status: Option<u8>,
-    bst_bms_over_temp_status: Option<u8>,
-    bst_charge_conn_status: Option<u8>,
-    bst_battery_pack_temp_status: Option<u8>,
-    bst_high_volt_relay_status: Option<u8>,
-    bst_charging_port_volt_status: Option<u8>,
-    bst_other_status: Option<u8>,
-    bst_current_status: Option<u8>,
-    bst_volt_status: Option<u8>,
+pub struct BST {
+    pub bst_insulation_status: Option<u8>,
+    pub bst_conn_over_temp_status: Option<u8>,
+    pub bst_bms_over_temp_status: Option<u8>,
+    pub bst_charge_conn_status: Option<u8>,
+    pub bst_battery_pack_temp_status: Option<u8>,
+    pub bst_high_volt_relay_status: Option<u8>,
+    pub bst_charging_port_volt_status: Option<u8>,
+    pub bst_other_status: Option<u8>,
+    pub bst_current_status: Option<u8>,
+    pub bst_volt_status: Option<u8>,
 }
 
 impl BST {
@@ -436,11 +439,11 @@ impl BST {
 }
 
 #[derive(Debug)]
-struct CCS {
-    ccs_out_volt: Option<f32>,
-    ccs_out_current: Option<f32>,
-    ccs_charge_time: Option<u16>,
-    ccs_charge_status: Option<u8>,
+pub struct CCS {
+    pub ccs_out_volt: Option<f32>,
+    pub ccs_out_current: Option<f32>,
+    pub ccs_charge_time: Option<u16>,
+    pub ccs_charge_status: Option<u8>,
 }
 
 impl CCS {
@@ -460,8 +463,8 @@ impl CCS {
 }
 
 #[derive(Debug)]
-struct CEM {
-    cem_error: Option<u32>,
+pub struct CEM {
+    pub cem_error: Option<u32>,
 }
 
 impl CEM {
@@ -472,22 +475,22 @@ impl CEM {
 }
 
 #[derive(Debug)]
-struct CML {
-    cm_max_out_volt: Option<f32>,
-    cml_min_out_volt: Option<f32>,
-    cml_max_out_current: Option<f32>,
-    cml_min_out_current: Option<f32>,
+pub struct CML {
+    pub cml_max_out_volt: Option<f32>,
+    pub cml_min_out_volt: Option<f32>,
+    pub cml_max_out_current: Option<f32>,
+    pub cml_min_out_current: Option<f32>,
 }
 
 impl CML {
     fn new(m: &Message) -> Self {
-        let cm_max_out_volt = bytes_to_f32(&m.data[0..1], &m.data[1..2], 256, 0.1, 0.0);
+        let cml_max_out_volt = bytes_to_f32(&m.data[0..1], &m.data[1..2], 256, 0.1, 0.0);
         let cml_min_out_volt = bytes_to_f32(&m.data[2..3], &m.data[3..4], 256, 0.1, 0.0);
         let cml_max_out_current = bytes_to_f32(&m.data[4..5], &m.data[5..6], 256, 0.1, 400.0);
         let cml_min_out_current = bytes_to_f32(&m.data[6..7], &m.data[7..8], 256, 0.1, 400.0);
 
         Self {
-            cm_max_out_volt,
+            cml_max_out_volt,
             cml_min_out_volt,
             cml_max_out_current,
             cml_min_out_current,
@@ -496,10 +499,10 @@ impl CML {
 }
 
 #[derive(Debug)]
-struct CRM {
-    crm_version: Option<String>,
-    crm_recognizable: Option<i8>,
-    crm_charge_pile_no: Option<String>,
+pub struct CRM {
+    pub crm_version: Option<String>,
+    pub crm_recognizable: Option<i8>,
+    pub crm_charge_pile_no: Option<String>,
 }
 
 impl CRM {
@@ -517,8 +520,8 @@ impl CRM {
 }
 
 #[derive(Debug)]
-struct CRO {
-    cro_bms_status: Option<u8>,
+pub struct CRO {
+    pub cro_bms_status: Option<u8>,
 }
 
 impl CRO {
@@ -529,10 +532,10 @@ impl CRO {
 }
 
 #[derive(Debug)]
-struct CSD {
-    csd_charge_time: Option<f32>,
-    csd_out_energy: Option<f32>,
-    csd_charge_pile_no: Option<u32>,
+pub struct CSD {
+    pub csd_charge_time: Option<f32>,
+    pub csd_out_energy: Option<f32>,
+    pub csd_charge_pile_no: Option<u32>,
 }
 
 impl CSD {
@@ -551,15 +554,15 @@ impl CSD {
 }
 
 #[derive(Debug)]
-struct CST {
-    cst_temp_status: Option<u8>,
-    cst_connector_status: Option<u8>,
-    cst_internal_temp_status: Option<u8>,
-    cst_power_status: Option<u8>,
-    cst_emergency_stop_status: Option<u8>,
-    cst_other_status: Option<u8>,
-    cst_current_status: Option<u8>,
-    cst_volt_status: Option<u8>,
+pub struct CST {
+    pub cst_temp_status: Option<u8>,
+    pub cst_connector_status: Option<u8>,
+    pub cst_internal_temp_status: Option<u8>,
+    pub cst_power_status: Option<u8>,
+    pub cst_emergency_stop_status: Option<u8>,
+    pub cst_other_status: Option<u8>,
+    pub cst_current_status: Option<u8>,
+    pub cst_volt_status: Option<u8>,
 }
 
 impl CST {
@@ -586,8 +589,8 @@ impl CST {
 }
 
 #[derive(Debug)]
-struct CTS {
-    cts_time: Option<String>,
+pub struct CTS {
+    pub cts_time: Option<String>,
 }
 
 impl CTS {
@@ -620,8 +623,8 @@ impl CTS {
 }
 
 #[derive(Debug)]
-struct CHM {
-    chm_version: Option<String>,
+pub struct CHM {
+    pub chm_version: Option<String>,
 }
 
 impl CHM {
