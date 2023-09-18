@@ -12,5 +12,6 @@ name = "iot_27930"
 path = "src/lib.rs"
 
 [dependencies]
+clap = { version = "4.4.3", features = ["derive"] }
 hex = "0.4.3"
 iot_common = { path = "../iot_common" }
