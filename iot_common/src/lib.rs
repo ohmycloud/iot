@@ -25,6 +25,14 @@ pub fn bytes_to_int8(array: &[u8]) -> Option<i8> {
     }
 }
 
+pub fn bytes_to_float32(array: &[u8]) -> Option<f32> {
+    if let Ok(slice) = array.try_into() {
+        Some(f32::from_le_bytes(slice))
+    } else {
+        None
+    }
+}
+
 pub fn bytes_to_int16(array: &[u8]) -> Option<i16> {
     if let Ok(slice) = array.try_into() {
         Some(i16::from_le_bytes(slice))
@@ -89,6 +97,22 @@ pub fn bytes_to_uint32(array1: &[u8],
         )
         .zip_with(
             bytes_to_uint8(array3).map(|x| x as u32 * remainder2),
+            |x, y| x + y,
+        )
+}
+
+pub fn init_info_obj_addr(
+                          array0: &[u8],
+                          array1: &[u8],
+                          array2: &[u8],
+                          ) -> Option<u32> {
+    bytes_to_uint8(array0)
+        .zip_with(
+            bytes_to_uint8(array1).map(|x| x as u32 * 256 ) ,
+            |x, y| x as u32 + y,
+        )
+        .zip_with(
+            bytes_to_uint8(array2).map(|x| x as u32 * 65536),
             |x, y| x + y,
         )
 }
