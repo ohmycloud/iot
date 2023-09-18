@@ -34,7 +34,7 @@ fn test_i_control_domain() {
 }
 
 #[test]
-fn test_asdu() {
+fn test_ti13_continuous() {
     let hex = "6871780002000d9414000100454200343353400034335340003433534000343353400034335340003433534000d222534000d222534000d2225340006f125340006f125340006f125340006f1253400034335340003433534000d222534000d2225340006f1253400000004040000000803f00";
     let message = hex::decode(hex);
     if let Ok(message) = message &&
@@ -57,7 +57,7 @@ fn test_asdu() {
 }
 
 #[test]
-fn test_asdu_not_continues() {
+fn test_ti13_not_continuous() {
     let hex = "68aa040000000d1403000100014000000020420002400000000c420003400000003442000440000000d2420018400085eb474200194000cd0cc743001a40009ad9c743001b4000cd4cc743001c40000000ff43001d400000608645001f400000001643002040000000344300234000678638440025400000004040002840009a593844002a400000002043002b400000002043002c400000003442002d40000000c842002e4000cdcc024300";
     let message = hex::decode(hex);
     if let Ok(message) = message &&
@@ -74,6 +74,29 @@ fn test_asdu_not_continues() {
                 var_struct_qualifier: VarStructQualifier { sq: Some(0), info_element_num: Some(20) },
                 common_address: Some(1),
                 init_info_obj_addr: Some(16385)
+            });
+        }
+    }
+}
+
+#[test]
+fn test_ti1_continuous() {
+    let hex = "683f2e00020001b2140001000100000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000";
+    let message = hex::decode(hex);
+    if let Ok(message) = message &&
+        message.len() > 6 {
+        if let Frame::IMessage(I {
+                                   send_serial_number,
+                                   receive_serial_number,
+                                   asdu
+                               }) = Frame::new(&Message::new(&message)) {
+            assert_eq!(send_serial_number, Some(23));
+            assert_eq!(receive_serial_number, Some(1));
+            assert_eq!(asdu, Asdu {
+                type_identifier: Some(1),
+                var_struct_qualifier: VarStructQualifier { sq: Some(1), info_element_num: Some(50) },
+                common_address: Some(1),
+                init_info_obj_addr: Some(1)
             });
         }
     }

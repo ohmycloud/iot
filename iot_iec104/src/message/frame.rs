@@ -64,6 +64,15 @@ impl I {
                              bytes_to_float32(&m.asdu[6..][i as usize * 5 + 3 .. i as usize * 5 + 7])
                     );
                 }
+
+            Some(1) if type_identifier == Some(1) =>
+            // 信息对象地址连续
+                for i in 0..info_element_num.unwrap_or(0) {
+                    println!("地址连续, 信息对象地址: {:?}, 信息对象值: {:?}", i as u32 + start_info_obj_addr.unwrap(),
+                             bytes_to_int8(&m.asdu[6..][i as usize + 3 .. i as usize + 4])
+                    );
+                }
+
             Some(0) if type_identifier == Some(13) =>
             // 信息对象地址不连续
                 for i in 0..info_element_num.unwrap_or(0) {
